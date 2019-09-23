@@ -20,24 +20,29 @@ class http:
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect((host,port))
 
-        request = "POST / HTTP/1.1\r\nHost:%s\r\n\r\n" % host
+        request = "POST /post HTTP/1.1\r\nHost: %s" % host
 
-        #message = "POST /auth HTTP/1.1\r\n"
-        #parameters = "userName=Ganesh&password=pass\r\n"
+        create_header = {'User-Agent': 'Concordia-HTTP/1.0',
+              'Content-Type': 'application/json',
+              'Content-Length': '14'
+              }
 
-        contentLength = "Content-Length: " + str(len(request))
-        contentType = "Content-Type: application/x-www-form-urlencoded\r\n"
+        start = "\r\n"
 
-        finalMessage = request + contentLength + contentType + "\r\n"
+        for key,value in create_header.items():
+            start += key + ": " + value
+            start +="\r\n"
 
-        client.send(finalMessage.encode("utf:8"))
+        payload = request+start+"\r\n{Assignment:1}"
+
+        client.send(payload.encode("utf-8"))
 
         response = client.recv(4096)
-        response = response.decode("utf:8")
+        response = response.decode("utf-8")
 
         print(response)
 
-http().post("www.google.com",80)
+http().post("httpbin.org",80)
 
 
 
