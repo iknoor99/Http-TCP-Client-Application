@@ -42,7 +42,7 @@ class http:
 
         print(response)
 
-http().post("httpbin.org",80)
+http().get("httpbin.org",80)
 
 
 
