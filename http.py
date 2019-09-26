@@ -1,9 +1,10 @@
 import socket
 from urllib.parse import urlparse
 
+class http:
 
-class Http:
     def __init__(self, url, body, headers):  # constructor to add values
+
         self.port = 80
         self.host = urlparse(url).netloc
         self.body = body
@@ -56,6 +57,7 @@ class Http:
 
     def post_request(self):
         request = "POST /post HTTP/1.1\r\n" + "Host: " + self.host+"\r\n" + self.header+"\r\n" + self.body
+        print("request is as follows :-")
         print(request)
         self.post(request)
 
@@ -64,26 +66,11 @@ class Http:
         self.get(request)
 
 
-def create_header(header,bodyvalue):  # to convert header dictionary to header_string
-    header_string = ""
-    if "Content-Type" in header:
-        pass
-    else:
-        header["Content-Type"] = "application/json"
-    if "Content-Length" in header:
-        pass
-    else:
-        header["Content-Length"] = str(len(bodyvalue))
+#data = {'User-Agent': 'Concordia-HTTP/1.0'}
+#body = '{"Assignment":1}'
+#header = create_header(data, body)
+#Http('http://httpbin.org/post', body, header).post_request()
 
-    for key, value in header.items():
-        header_string = header_string + key + ": " + value + "\r\n"
-    return header_string
-
-
-data = {'User-Agent': 'Concordia-HTTP/1.0'}
-body = '{"Assignment":1}'
-header = create_header(data, body)
-Http('http://httpbin.org/post', body, header).post_request()
 
 
 
