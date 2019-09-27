@@ -81,7 +81,7 @@ class httpc:
         if(flaggetpost=='get'):
             print("inside get command")
             header_string = self.create_header(self.headerdict, bodyvalue)
-            http("http://www.httpbin.org/absolute-redirect/", bodyvalue, header_string, verflag, is_write, output_file, flaggetpost).get_request()
+            http("http://www.httpbin.org/post", bodyvalue, header_string, verflag, is_write, output_file, flaggetpost).get_request()
 
         elif(flaggetpost=='post'):
             print("inside post command")
@@ -90,7 +90,7 @@ class httpc:
                 bodyvalue = file.read()
                 file.close()
             header_string = self.create_header(self.headerdict, bodyvalue)
-            http('http://www.google.com', bodyvalue, header_string, verflag, is_write, output_file, flaggetpost).post_request()
+            http('http://www.httpbin.org/post', bodyvalue, header_string, verflag, is_write, output_file, flaggetpost).post_request()
             # http("http://httpbin.org/post?course=networking&assignment=1", bodyvalue, header_string,
                  # verflag).get_request()
 

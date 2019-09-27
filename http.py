@@ -112,8 +112,7 @@ class http:
         self.post(request)
 
     def get_request(self):
-        self.count += 1
-        request = "GET / HTTP/1.1\r\n" + "Host: " + self.host+"\r\n" + self.header + "\r\n"
+        request = "GET / HTTP/1.1\r\n" + "Host: " + self.host+"\r\n" + self.header+"\r\n"
         print("request is as follows :-")
         print(request)
         self.get(request)
