@@ -39,11 +39,12 @@ class httpc:
 
             if(self.inputlist[i]=='get'):
                 flag_g = True
+                print("flag get is true.")
 
             elif (self.inputlist[i] == 'post'):
                 flag_p = True
 
-        if not flag_g and flag_g:
+        if (not flag_p) and flag_g:
             flaggetpost = "get"
         elif flag_p and not flag_g:
             flaggetpost = "post"
@@ -80,7 +81,7 @@ class httpc:
         if(flaggetpost=='get'):
             print("inside get command")
             header_string = self.create_header(self.headerdict, bodyvalue)
-            http("http://httpbin.org/get", bodyvalue, header_string, verflag, is_write, output_file).get_request()
+            http("http://www.httpbin.org/absolute-redirect/", bodyvalue, header_string, verflag, is_write, output_file, flaggetpost).get_request()
 
         elif(flaggetpost=='post'):
             print("inside post command")
@@ -89,7 +90,7 @@ class httpc:
                 bodyvalue = file.read()
                 file.close()
             header_string = self.create_header(self.headerdict, bodyvalue)
-            http('http://httpbin.org/post', bodyvalue, header_string, verflag, is_write, output_file).post_request()
+            http('http://www.google.com', bodyvalue, header_string, verflag, is_write, output_file, flaggetpost).post_request()
             # http("http://httpbin.org/post?course=networking&assignment=1", bodyvalue, header_string,
                  # verflag).get_request()
 
