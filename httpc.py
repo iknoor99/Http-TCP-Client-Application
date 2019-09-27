@@ -8,7 +8,6 @@ class httpc:
         self.headerdict = {}
 
     def create_header(self, header, bodyvalue):  # to convert header dictionary to header_string
-
         header_string = ""
         if "Content-Type" in header:
             pass
@@ -31,17 +30,29 @@ class httpc:
         bodyvalue = ""
         fileflag = ""
         fileloc = ""
-
+        flag_g = False
+        flag_p = False
+        is_write = False
+        output_file = ""
 
         for i in range(0,len(self.inputlist)):
 
             if(self.inputlist[i]=='get'):
-                flaggetpost='get'
-                break
+                flag_g = True
 
             elif (self.inputlist[i] == 'post'):
-                flaggetpost='post'
-                break
+                flag_p = True
+
+        if not flag_g and flag_g:
+            flaggetpost = "get"
+        elif flag_p and not flag_g:
+            flaggetpost = "post"
+        elif flag_g and flag_p:
+            print("\n\n Command contains both get and post. Exiting the program!")
+            exit()
+        elif not flag_g and not flag_p:
+            print("\n\n Command contains neither get nor post. Exiting the program!")
+            exit()
 
         for i in range(0, len(self.inputlist)):
             if (self.inputlist[i] == '-h'):
@@ -49,6 +60,10 @@ class httpc:
 
             if (self.inputlist[i] == '-v'):
                 verflag = True
+
+            if (self.inputlist[i] == '-o'):
+                is_write = True
+                output_file = self.inputlist[i+1]
 
             if (flaggetpost =='post' and self.inputlist[i] == '-f'):
                 fileflag = True
@@ -64,16 +79,19 @@ class httpc:
 
         if(flaggetpost=='get'):
             print("inside get command")
-            getobj = http(self.inputlist[-1],headerval, bodyvalue)
-            getobj.get_request()
+            header_string = self.create_header(self.headerdict, bodyvalue)
+            http("http://httpbin.org/get", bodyvalue, header_string, verflag, is_write, output_file).get_request()
 
         elif(flaggetpost=='post'):
             print("inside post command")
             if fileflag:
                 file = open(fileloc, "r")
                 bodyvalue = file.read()
+                file.close()
             header_string = self.create_header(self.headerdict, bodyvalue)
-            http('http://httpbin.org/post', bodyvalue, header_string).post_request()
+            http('http://httpbin.org/post', bodyvalue, header_string, verflag, is_write, output_file).post_request()
+            # http("http://httpbin.org/post?course=networking&assignment=1", bodyvalue, header_string,
+                 # verflag).get_request()
 
     def header_dic(self, index, input_list):
         next_val = input_list[index+1].strip()
