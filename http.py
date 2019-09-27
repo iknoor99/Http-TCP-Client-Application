@@ -3,12 +3,14 @@ from urllib.parse import urlparse
 
 class http:
 
+
     def __init__(self, url, body, headers):  # constructor to add values
 
         self.port = 80
         self.host = urlparse(url).netloc
         self.body = body
         self.header = headers
+        self.count = 0
 
     def display_msg(self, msg):
         header_l = msg.split('\r\n\r\n')
@@ -62,14 +64,11 @@ class http:
         self.post(request)
 
     def get_request(self):
+        self.count += 1
         request = "GET / HTTP/1.1\r\nHost:%s\r\n\r\n" % self.host
         self.get(request)
 
 
-#data = {'User-Agent': 'Concordia-HTTP/1.0'}
-#body = '{"Assignment":1}'
-#header = create_header(data, body)
-#Http('http://httpbin.org/post', body, header).post_request()
 
 
 

@@ -1,35 +1,13 @@
-import argparse
 from http import http
-
-parser = argparse.ArgumentParser(description='httpc is a curl-like application but supports HTTP protocol only.',
-                                 epilog='''Use "httpc help [command]" for more information about a command.''')
-
-subparser = parser.add_subparsers(dest='start')
-
-parserget = subparser.add_parser('get',help='get executes a HTTP GET request and prints the response.')
-parserget.add_argument('-v', action='store_true', help='Prints the detail of the response such as protocol, status,and headers.')
-parserget.add_argument('-H', action='store_true', help='''Associates headers to HTTP Request with the format 'key:value'.''')
-
-parserpost = subparser.add_parser('post',help='post executes a HTTP POST request and prints the response.')
-parserpost.add_argument('-v', action='store_true', help='Prints the detail of the response such as protocol, status,and headers.')
-parserpost.add_argument('-H', action='store_true', help='''Associates headers to HTTP Request with the format 'key:value'.''')
-parserpost.add_argument('-d', help='string Associates an inline data to the body HTTP POST request.')
-parserpost.add_argument('-f', action='store_true', help='Associates the content of a file to the body HTTP POST request')
-
-parser.add_argument('URL')
-
-mainargs = parser.parse_args()
-
-print(mainargs.v)
-print(mainargs.H)
-print(mainargs.d)
 
 class httpc:
 
-    def __init__(self, mainargs):
-        self.mainargs = mainargs
+    def __init__(self, inputlist):
+        print("inside constructor")
+        self.inputlist = inputlist
+        self.headerdict = {}
 
-    def create_header(self,header,bodyvalue):  # to convert header dictionary to header_string
+    def create_header(self, header, bodyvalue):  # to convert header dictionary to header_string
 
         header_string = ""
         if "Content-Type" in header:
@@ -45,58 +23,84 @@ class httpc:
             header_string = header_string + key + ": " + value + "\r\n"
         return header_string
 
-    def start_request(self):
-        print("request started")
+    def check_string(self):
+        print("inside check string")
+        flaggetpost = ""
+        verflag = False
+        headerval = ""
+        bodyvalue = ""
+        fileflag = ""
+        fileloc = ""
 
-        if self.mainargs.start =='get':
-            print("request for get")
 
-            if self.mainargs.v: # for checking verbose
-                print("it is verbose")
+        for i in range(0,len(self.inputlist)):
 
-            if self.mainargs.H:
-                pass
+            if(self.inputlist[i]=='get'):
+                flaggetpost='get'
+                break
 
-            getobj = http(self.mainargs.URL, '', '')
+            elif (self.inputlist[i] == 'post'):
+                flaggetpost='post'
+                break
+
+        for i in range(0, len(self.inputlist)):
+            if (self.inputlist[i] == '-h'):
+                self.header_dic(i, self.inputlist)
+
+            if (self.inputlist[i] == '-v'):
+                verflag = True
+
+            if (flaggetpost =='post' and self.inputlist[i] == '-f'):
+                fileflag = True
+                fileloc = self.inputlist[i+1]
+
+            if (flaggetpost =='post' and self.inputlist[i] == '-d'):
+                fileflag = False
+                bodyvalue = self.inputlist[i+1]
+
+        print("flaggetpost value: " + flaggetpost)
+        print("header dictionary")
+        print(self.headerdict)
+
+        if(flaggetpost=='get'):
+            print("inside get command")
+            getobj = http(self.inputlist[-1],headerval, bodyvalue)
             getobj.get_request()
 
-        elif self.mainargs.start =='post':
+        elif(flaggetpost=='post'):
+            print("inside post command")
+            if fileflag:
+                file = open(fileloc, "r")
+                bodyvalue = file.read()
+            header_string = self.create_header(self.headerdict, bodyvalue)
+            http('http://httpbin.org/post', bodyvalue, header_string).post_request()
 
-            print("request for post")
-            headdata={'User-Agent': 'Concordia-HTTP/1.0'}
-            inlinedata=""
-            maindict = {}
-
-            if self.mainargs.H is not None:
-                pass
-
-            if self.mainargs.d is not None: # for inline data
-                print("it is inline")
-
-                for dic in [headdata, self.mainargs.d]:
-                    maindict.update(dic)
-
-                inlinedata=self.mainargs.d
-
-            elif self.mainargs.f:
-                print("it is file")
-
-            finalheader=self.create_header(maindict,inlinedata)
-            print("finalheader:-"+finalheader)
-            print("inlinedata:-"+inlinedata)
-            postobj = http(self.mainargs.URL, finalheader, inlinedata)
-            postobj.post_request()
-
+    def header_dic(self, index, input_list):
+        next_val = input_list[index+1].strip()
+        pos = next_val.find(':')
+        length = len(next_val) - 1
+        if pos >= 0:      # colon is present in the next value
+            if pos == length:         # colon is at the end of the value  -- KEY: VALUE
+                key = next_val.replace(":", "")
+                key = key.strip()
+                value = input_list[index+2].strip()
+                self.headerdict[key] = value
+            else:                                          # --- KEY:VALUE
+                split_head = next_val.split(':')
+                key = split_head[0].strip()
+                value = split_head[1].strip()
+                self.headerdict[key] = value
         else:
-            print("check your request")
+            key = next_val.strip()
+            if input_list[index+2].strip() == ":":   # ---- KEY : VALUE
+                value = input_list[index+3]
+            else:                                       #  ----- KEY :VALUE
+                value = input_list[index+2].replace(":", "")
+                value = value.strip()
+            self.headerdict[key] = value
 
-httpc(mainargs).start_request()
+inputstring = input("Please enter the command:\n")
+inputarr = inputstring.split(" ")
 
-
-
-
-
-
-
-
-
+if(inputarr[0] == 'httpc'):
+    httpc(inputarr[1:]).check_string()
