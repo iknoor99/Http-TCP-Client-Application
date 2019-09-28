@@ -7,17 +7,17 @@ class http:
     def __init__(self, url, body, headers, is_verbose, is_write, output_file, req_type):  # constructor to add values
 
         self.port = 80
-        self.host = urlparse(url).netloc
+        self.host = ""
         self.url = url
-        print("Host is " + self.host)
         self.body = body
         self.header = headers
-        self.count = 0
         self.is_verbose = is_verbose
         self.is_write = is_write
         self.output_file = output_file
         self.reply_header = {}
         self.req_type = req_type
+        self.path = ""
+
 
     def display_msg(self, msg):
         header_l = msg.split('\r\n\r\n')
@@ -41,9 +41,7 @@ class http:
         if (resp_code == "301" or resp_code == "302" or resp_code == "300") and self.count <= 5:
 
             url_r = self.reply_header['Location']
-            #url_redirect = urlparse(url_r)
-            #self.host = url_redirect.netloc
-            self.host = url_r
+            self.url = url_r
             print("Redirecting to new URL:" + str(url_r))
             if self.req_type == "get":
                 self.get_request()
@@ -104,21 +102,47 @@ class http:
         finally:
             client.close()
 
+    def url_break(self, url):
+        print("In url_break :   " + url)
+        if url.startswith('https://'):
+            len_u = len(url)
+            url = url[8:len_u]
+        elif url.startswith('http://'):
+            len_u = len(url)
+            url = url[7:len_u]
+        pos = url.find('/')
+        pos1 = url.find('?')
+        if pos >=0:
+            self.host = url[0:pos]
+            print("Host is  " + self.host)
+            self.path = url[pos:len(url)]
+            print("Path is  " + self.path)
+        elif pos1 >=0:
+            self.host = url[0:pos1]
+            print("Host is  " + self.host)
+        else:
+            self.host = url[0:len(url)]
+            print("Host is  " + self.host)
+
+
 
     def post_request(self):
-        request = "POST /post HTTP/1.1\r\n" + "Host: " + self.host+"\r\n" + self.header+"\r\n" + self.body
+        self.url_break(self.url)
+        if self.path == "":
+            self.path = "/"
+        request = "POST " + self.path + " HTTP/1.1\r\n" + "Host: " + self.host+"\r\n" + self.header+"\r\n" + self.body
         print("request is as follows :-")
         print(request)
         self.post(request)
 
     def get_request(self):
-        request = "GET / HTTP/1.1\r\n" + "Host: " + self.host+"\r\n" + self.header+"\r\n"
+        self.url_break(self.url)
+        if self.path == "":
+            self.path = "/"
+        request = "GET " + self.path + " HTTP/1.1\r\n" + "Host: " + self.host+"\r\n" + self.header+"\r\n"
         print("request is as follows :-")
         print(request)
         self.get(request)
-
-
-
 
 
 
