@@ -28,21 +28,23 @@ class http:
         resp_msg = first_line[2]
         for line in range(1, len(str_lines)):
             string_h = str(str_lines[line])
-            #print("string is---        " + string_h)
             pos = string_h.find(":")
             pos = pos
             key_r = string_h[0:pos].strip()
             pos = pos+1
             length = len(string_h)
             value_r = string_h[pos:length]
-            #print("In map  " + str(key_r) + "-" + str(value_r))
             self.reply_header[str(key_r)] = str(value_r).strip()
         print(self.reply_header)
         if (resp_code == "301" or resp_code == "302" or resp_code == "300") and self.count <= 5:
 
             url_r = self.reply_header['Location']
-            self.url = url_r
-            print("Redirecting to new URL:" + str(url_r))
+            if self.host in url_r:
+                self.url = url_r
+            else:
+                url_s = self.host + url_r
+                self.url = url_s
+            print("Redirecting to new URL:" + str(self.url))
             if self.req_type == "get":
                 self.get_request()
             elif self.req_type == "post":
