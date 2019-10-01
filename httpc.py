@@ -162,5 +162,29 @@ class httpc:
 inputstring = input("Please enter the command:\n")
 inputarr = inputstring.split(" ")
 
-if(inputarr[0] == 'httpc'):
+if(inputarr[0] == 'httpc') and (inputarr[1] == 'help'):
+    if (len(inputarr) > 2):
+        if (inputarr[2] == 'get'):
+            print("\n\nusage: httpc get [-v] [-h key:value] URL")
+            print("\nGet executes a HTTP GET request for a given URL.")
+            print("-v               Prints the detail of the response such as protocol, status and headers.")
+            print("-h key:value     Associates headers to HTTP Request with the format 'key:value'.")
+        elif (inputarr[2] == 'post'):
+            print("\n\nusage: httpc post [-v] [-h key:value] [-d inline-data] [-f file] URL")
+            print("\nPost executes a HTTP POST request for a given URL with inline data or from file.")
+            print("-v               Prints the detail of the response such as protocol, status and headers.")
+            print("-h key:value     Associates headers to HTTP Request with the format 'key:value.'")
+            print("-d string        Associates an inline data to the body HTTP POST request.")
+            print("-f file          Associates the content of a file to the body HTTP POST request.")
+            print("\n\n Either [-d] or [-f] can be used but not both.")
+    else:
+        print("\n\nhttpc is a curl-like application but supports HTTP protocol only.")
+        print("Usage:")
+        print("     httpc command [arguments]")
+        print("The commands are:")
+        print("     get     executes a HTTP GET request and prints the response.")
+        print("     post    executes a HTTP POST request and prints the response.")
+        print("     help    prints this screen.")
+        
+elif(inputarr[0] == 'httpc'):
     httpc(inputarr[1:]).check_string()
