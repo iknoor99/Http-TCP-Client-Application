@@ -185,6 +185,6 @@ if(inputarr[0] == 'httpc') and (inputarr[1] == 'help'):
         print("     get     executes a HTTP GET request and prints the response.")
         print("     post    executes a HTTP POST request and prints the response.")
         print("     help    prints this screen.")
-        
+
 elif(inputarr[0] == 'httpc'):
     httpc(inputarr[1:]).check_string()
