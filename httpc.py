@@ -1,9 +1,9 @@
-from http import http
+from LA1.http import http
 
 class httpc:
 
     def __init__(self, inputlist):
-        print("inside constructor")
+        #print("inside constructor")
         self.inputlist = inputlist
         self.headerdict = {}
         self.remove_index = []
@@ -26,7 +26,7 @@ class httpc:
         return header_string
 
     def check_string(self):
-        print("inside check string")
+        #print("inside check string")
         flaggetpost = ""
         verflag = False
         headerval = ""
@@ -36,6 +36,8 @@ class httpc:
         inline_flag = False
         flag_g = False
         flag_p = False
+        d_flag = False
+        f_flag = False
         is_write = False
         output_file = ""
         URL = ""
@@ -49,7 +51,7 @@ class httpc:
             elif (self.inputlist[i] == 'post'):
                 flag_p = True
 
-        print(self.inputlist)
+        #print(self.inputlist)
 
         if (not flag_p) and flag_g:
             flaggetpost = "get"
@@ -64,9 +66,28 @@ class httpc:
             print("\n\n Command contains neither get nor post. Exiting the program!")
             exit()
 
+
+        for i in range(0, len(self.inputlist)):
+            if (self.inputlist[i] == '-d'):
+                d_flag = True
+            if (self.inputlist[i] == '-f'):
+                f_flag = True
+
+        if flaggetpost == "get" and (d_flag or f_flag):
+            print("Wrong Command! get can be used neither with -d nor with -f")
+            exit()
+
+        if flaggetpost == "post" and d_flag and f_flag:
+            print("Wrong Command! post can be used either with -d or with -f and not with both of them")
+            exit()
+
+
+        #print(self.inputlist)
+
         for i in range(0, len(self.inputlist)):
             if (self.inputlist[i] == '-h'):
                 self.header_dic(i, self.inputlist)
+                #print(self.remove_index)
 
             if (self.inputlist[i] == '-v'):
                 verflag = True
@@ -89,17 +110,18 @@ class httpc:
                 self.remove_index.append(i)
 
         self.remove_index.sort(reverse=True)
-        print(self.remove_index)
+        #print(self.remove_index)
         for i in self.remove_index:
             self.inputlist.remove(self.inputlist[i])
-            print(self.inputlist)
+
+        #print(self.inputlist)
 
         for i in range(0, len(self.inputlist)):
             string_u = str(self.inputlist[i])
             if string_u.startswith('http://') or string_u.startswith('https://') or string_u.startswith('www.'):
-                print("url found")
+                #print("url found")
                 URL = string_u
-                print("URL is:" + URL)
+                #print("URL is:" + URL)
                 self.inputlist.remove(URL)
                 break
 
@@ -107,22 +129,22 @@ class httpc:
             string_m = ""
             for i in range(0, len(self.inputlist)):
                 string_m += str(self.inputlist[i]) + " "
-            print("Body is" + string_m)
-            bodyvalue = string_m
+            #print("Body is" + string_m)
+            bodyvalue = string_m.strip()
 
 
-        print(self.inputlist)
-        print("flaggetpost value: " + flaggetpost)
-        print("header dictionary")
-        print(self.headerdict)
+        #print(self.inputlist)
+        #print("flaggetpost value: " + flaggetpost)
+        #print("header dictionary")
+        #print(self.headerdict)
 
         if(flaggetpost=='get'):
-            print("inside get command")
+            #print("inside get command")
             header_string = self.create_header(self.headerdict, bodyvalue)
             http(URL, bodyvalue, header_string, verflag, is_write, output_file, flaggetpost).get_request()
 
         elif(flaggetpost=='post'):
-            print("inside post command")
+            #print("inside post command")
             if fileflag:
                 file = open(fileloc, "r")
                 bodyvalue = file.read()
@@ -161,21 +183,26 @@ class httpc:
 
 inputstring = input("Please enter the command:\n")
 inputarr = inputstring.split(" ")
+while '' in inputarr:
+    inputarr.remove('')
+#print(inputarr)
 
 if(inputarr[0] == 'httpc') and (inputarr[1] == 'help'):
     if (len(inputarr) > 2):
         if (inputarr[2] == 'get'):
-            print("\n\nusage: httpc get [-v] [-h key:value] URL")
+            print("\n\nusage: httpc get [-v] [-h key:value] [-o outputFile] URL")
             print("\nGet executes a HTTP GET request for a given URL.")
             print("-v               Prints the detail of the response such as protocol, status and headers.")
             print("-h key:value     Associates headers to HTTP Request with the format 'key:value'.")
+            print("-o outputFile    Writes the body of the response to the output file.")
         elif (inputarr[2] == 'post'):
-            print("\n\nusage: httpc post [-v] [-h key:value] [-d inline-data] [-f file] URL")
+            print("\n\nusage: httpc post [-v] [-h key:value] [-d inline-data] [-f file] [-o outputFile] URL")
             print("\nPost executes a HTTP POST request for a given URL with inline data or from file.")
             print("-v               Prints the detail of the response such as protocol, status and headers.")
             print("-h key:value     Associates headers to HTTP Request with the format 'key:value.'")
             print("-d string        Associates an inline data to the body HTTP POST request.")
             print("-f file          Associates the content of a file to the body HTTP POST request.")
+            print("-o outputFile    Writes the body of the response to the output file.")
             print("\n\n Either [-d] or [-f] can be used but not both.")
     else:
         print("\n\nhttpc is a curl-like application but supports HTTP protocol only.")
@@ -188,3 +215,7 @@ if(inputarr[0] == 'httpc') and (inputarr[1] == 'help'):
 
 elif(inputarr[0] == 'httpc'):
     httpc(inputarr[1:]).check_string()
+
+else:
+    print("Invalid Command!")
+    exit()
